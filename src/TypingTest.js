@@ -1,4 +1,5 @@
-import React, { useState, useEffect}from 'react';
+import React, { useState }from 'react';
+
 
 
 // how to build a box for you to type in with words in it?
@@ -8,48 +9,85 @@ import React, { useState, useEffect}from 'react';
 //check if the key is being macthed with the charcter
 
 
+function Preview (props) {
+    const sentence = props.sentence.split(''); // split the text into a array so you have control of each charcter
+    const userInput = props.userInput
+    return (
+        <div>
+            {/* a way to color each character in a word */}
+            {sentence.map((c, i) => {
+                let color;
+                if (i < userInput.length) {
+                    color = c === userInput[i] ? '#dfffa0' : '#fcbea4';
+                }
+                return (
+                    <span key={i} style={{backgroundColor: color}}>{c}</span>
+                )
+            })}
+        </div>
+    );
+}
+
+function Speed (props) {
+    return (
+        <div>
+            speed
+        </div>
+    )
+}
+
 
 function TypingTest () {
-    // we separte the states to make it easier to work with
-    const [time, setTime] = useState(0)
-    const [timerOn, setTimeOn] = useState(false)
-    const [sentence, setSentence] = useState([]); // maybe have array of sentence
-    
-    useEffect(() => {
-        console.log(timerOn)
-        let interval = null;
-        if (timerOn) {
-            interval = setInterval(() => {
-                setTime(prevTime => prevTime + 1) 
-            }, 1000)
-        } else {
-            clearInterval(interval)
-        }
-        
-        return () => clearInterval(interval)
-    }, [timerOn])  
+    const [state, setState] = useState({
+        time: 0,
+        timerOn: false,
+        sentence: 'Test',
+        userInput: '',
+    })
+
+    const onUserInputChange = (e) => {
+        const value = e.target.value;
+        setState({
+            ...state,
+            userInput: value,
+        })
+        console.log(state.userInput)
+    }
     // set new state for end time
     // logic 
     // get the character in numbers and divided by the difference
     
     const reset = () => {
-        setTime(0);
-        setTimeOn(false)
-        // setSentence() /// set to a random number for the index
+        setState({
+            time: 0,
+            timerOn: false,
+            sentence: 'Test',
+            userInput: ' ',
+        })
     }
     //  A reset button
     return (
         <div> 
             {/* Display Timer  */}
-            <h2>{time}</h2>
+            <h2>{state.time}</h2>
 
             {/* Have a display of current cahrarchter
             get a underline under current  character*/}
-
+            <Preview sentence= {state.sentence} userInput ={state.userInput}/>
+            <textarea 
+            value= {state.userInput}
+            onChange= {onUserInputChange}
+            rows="5" cols="50"
+            placeholder=" Start Typing"
+            ></textarea>
             {/* display character per second */}
+            <Speed />
 
             {/* need to add a start and stop timer to onChange */}
-            <button onClick={() => setTimeOn(!timerOn)}>Press Me</button> 
+            <button onClick={() => setState({
+                ...state, 
+                timerOn: !state.timerOn
+                })}>Press Me</button> 
             <button onClick={() => reset()}>Reset Typing test</button>
         </div>
     )
