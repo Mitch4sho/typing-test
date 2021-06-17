@@ -1,4 +1,5 @@
 import React, { useState, useEffect }from 'react';
+import { Box, Button, Grid } from '@material-ui/core';
 
 
 function getSentence () {
@@ -34,7 +35,7 @@ function Speed (props) {
     const time = props.time;
     const characters = props.characters;
     if (time !== 0 && characters !== 0 ) {
-        let cps = Math.floor(characters / time);
+        let cps = Math.floor(characters /time);
         return (
             <div>
                 <p>{cps} characters per second</p>
@@ -104,25 +105,31 @@ function TypingTest () {
             characters: 0,
         })
     }
-    
+
     return (
-        <div> 
-            <h2>{state.time}</h2>
-
-            <Preview sentence= {state.sentence} userInput ={state.userInput}/>
-
-            <textarea 
-            value= {state.userInput}
-            onChange= {onUserInputChange}
-            rows="5" cols="50"
-            placeholder=" Start Typing"
-            readOnly={state.userInput.length === state.sentence.length}
-            ></textarea>
-
-            <Speed time={state.time} characters={state.characters}/>
-
-            <button onClick={() => reset()}>Reset Typing test</button>
-        </div>
+        <Box mt={20}> 
+            <Grid container spacing={4}>
+                <Grid item xs={12}>
+                    <paper>Curent time: {state.time}</paper>
+                </Grid>
+                <Grid item xs={12}>
+                    <Preview sentence= {state.sentence} userInput ={state.userInput}/>
+                </Grid>
+                <Grid item xs={12}>
+                    <textarea 
+                    value= {state.userInput}
+                    onChange= {onUserInputChange}
+                    rows="5" cols="50"
+                    placeholder=" Start Typing"
+                    readOnly={state.userInput.length === state.sentence.length}
+                    ></textarea>
+                </Grid>
+                <Grid item xs={12}>
+                    <Speed time={state.time} characters={state.characters}/>
+                    <Button variant="contained" color="primary" onClick={() => reset()}>Reset Typing test</Button>
+                </Grid>
+            </Grid>
+        </Box>
     )
 }
 
