@@ -1,13 +1,15 @@
-import React, { useState }from 'react';
+import React, { useState, useEffect }from 'react';
 
 
+function getSentence () {
+    const sentence = [
+        'Swim at your own risk was taken as a challenge for the group of Kansas City college students.',
+        'It took him a while to realize that everything he decided not to change, he was actually choosing.',
+        '25 years later, she still regretted that specific moment.',
+    ]
 
-// how to build a box for you to type in with words in it?
-// how to put a underline for each charcter
-// how to check if the character is clicked
-// check if the sentence length is reached
-//check if the key is being macthed with the charcter
-
+    return sentence[Math.floor(Math.random() * sentence.length)]
+}
 
 function Preview (props) {
     const sentence = props.sentence.split(''); // split the text into a array so you have control of each charcter
@@ -29,65 +31,96 @@ function Preview (props) {
 }
 
 function Speed (props) {
-    return (
-        <div>
-            speed
-        </div>
-    )
+    const time = props.time;
+    const characters = props.characters;
+    if (time !== 0 && characters !== 0 ) {
+        let cps = Math.floor(characters / time);
+        return (
+            <div>
+                <p>{cps} characters per second</p>
+            </div>
+        )
+    }
+    return null;
 }
-
 
 function TypingTest () {
     const [state, setState] = useState({
         time: 0,
         timerOn: false,
-        sentence: 'Test',
+        sentence: getSentence(),
         userInput: '',
+        characters: 0,
     })
 
     const onUserInputChange = (e) => {
         const value = e.target.value;
         setState({
             ...state,
+            timerOn: true,
             userInput: value,
+            characters: countCorrectCharaters(value)
         })
-        console.log(state.userInput)
     }
-    // set new state for end time
-    // logic 
-    // get the character in numbers and divided by the difference
+
+    const countCorrectCharaters = (userInput) => {
+        const text = state.sentence.replace(' ', '');
+        return userInput.replace(' ', '').split('').filter((s, i) => s === text[i]).length
+    }
+
+    useEffect(() => {
+        let interval = null;
+
+        if (state.timerOn) {
+            interval = setInterval(() => {
+                setState(prev => {
+                    return {
+                        ...prev,
+                        time: prev.time + 1,
+                    }
+                })}, 1000);
+        }
+
+        if (state.userInput.length === state.sentence.length) {
+            clearInterval(interval);
+            setState(prev => {
+                return {
+                    ...prev,
+                   timerOn: false,
+                }
+            })
+        }
+
+        return () => clearInterval(interval);
+
+    }, [state.timerOn, state.userInput, state.sentence])
     
     const reset = () => {
         setState({
             time: 0,
             timerOn: false,
-            sentence: 'Test',
-            userInput: ' ',
+            sentence: getSentence(),
+            userInput: '',
+            characters: 0,
         })
     }
-    //  A reset button
+    
     return (
         <div> 
-            {/* Display Timer  */}
             <h2>{state.time}</h2>
 
-            {/* Have a display of current cahrarchter
-            get a underline under current  character*/}
             <Preview sentence= {state.sentence} userInput ={state.userInput}/>
+
             <textarea 
             value= {state.userInput}
             onChange= {onUserInputChange}
             rows="5" cols="50"
             placeholder=" Start Typing"
+            readOnly={state.userInput.length === state.sentence.length}
             ></textarea>
-            {/* display character per second */}
-            <Speed />
 
-            {/* need to add a start and stop timer to onChange */}
-            <button onClick={() => setState({
-                ...state, 
-                timerOn: !state.timerOn
-                })}>Press Me</button> 
+            <Speed time={state.time} characters={state.characters}/>
+
             <button onClick={() => reset()}>Reset Typing test</button>
         </div>
     )
